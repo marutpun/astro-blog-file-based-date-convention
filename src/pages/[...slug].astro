@@ -1,0 +1,47 @@
+---
+import { getCollection, render } from 'astro:content';
+import BlogPostLayout from '@/layouts/BlogPostLayout.astro';
+import { parseBlogFileName } from '@/utils/blogUtils';
+import Layout from '@/layouts/Layout.astro';
+
+export async function getStaticPaths() {
+  const blogposts = await getCollection('blog');
+  return blogposts.map((post) => {
+    if (post.filePath) {
+      const parsedBlogFileName = parseBlogFileName(post.filePath);
+
+      // if frontmatter has slug, use slug
+      // or use file name slug (fallback)
+      const slug = post.data.slug || parsedBlogFileName.slug;
+      return {
+        params: { slug },
+        props: { post, parsedBlogFileName },
+      };
+    }
+  });
+}
+const { post, parsedBlogFileName } = Astro.props;
+const { Content } = await render(post);
+---
+
+<Layout title={post.data.title}>
+  <BlogPostLayout>
+    <article class="content">
+      <header>
+        <h1>{post.data.title}</h1>
+        <time datetime={new Date(parsedBlogFileName.date!).toISOString()} class="mb-4 is-block"
+          >{
+            parsedBlogFileName.date
+              ? new Date(parsedBlogFileName.date).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                })
+              : ''
+          }</time
+        >
+      </header>
+      <Content />
+    </article>
+  </BlogPostLayout>
+</Layout>

@@ -1,0 +1,33 @@
+---
+import SidebarDesktop from '@/components/SidebarDesktop.astro';
+import { parseBlogFileName } from '@/utils/blogUtils';
+import { getCollection } from 'astro:content';
+
+const blogPosts = (await getCollection('blog'))
+  .map((post) => {
+    if (post.filePath) {
+      const parsedBlogFileName = parseBlogFileName(post.filePath);
+      const slug = post.data.slug || parsedBlogFileName.slug;
+
+      return { ...post, data: { ...post.data, ...parsedBlogFileName, slug } };
+    }
+    return post;
+  })
+  .sort((a, b) => {
+    if (a.data.date && b.data.date) {
+      return new Date(b.data.date).valueOf() - new Date(a.data.date).valueOf();
+    }
+    return 0;
+  });
+---
+
+<div class="container my-5">
+  <div class="columns">
+    <div class="column is-12-mobile is-3-desktop">
+      <SidebarDesktop content={blogPosts} />
+    </div>
+    <div class="column is-12-mobile is-7-desktop">
+      <slot />
+    </div>
+  </div>
+</div>

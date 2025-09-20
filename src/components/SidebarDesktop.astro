@@ -1,0 +1,55 @@
+---
+import { parseBlogFileName } from '@/utils/blogUtils';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  content: CollectionEntry<'blog'>[];
+}
+
+const { content } = Astro.props;
+---
+
+<aside class="menu is-hidden-touch">
+  <p class="menu-label">Recent posts</p>
+  {
+    content && (
+      <ul class="menu-list">
+        {content.map((post) => {
+          if (post.filePath) {
+            const parsedBlogFileName = parseBlogFileName(post.filePath);
+            const rawSlug = post.data.slug || parsedBlogFileName.slug;
+            const slug = rawSlug.startsWith('/') ? rawSlug : `/${rawSlug}`; // remove slash ('/')
+            const isCurrentPage = Astro.url.pathname === `/${post.data.text}`;
+            return (
+              <li>
+                <a
+                  aria-current={isCurrentPage ? 'page' : undefined}
+                  href={slug}
+                  class:list={[{ 'is-active': isCurrentPage }]}
+                >
+                  {post.data.title}
+                </a>
+              </li>
+            );
+          }
+        })}
+      </ul>
+    )
+  }
+</aside>
+
+<script>
+  document.addEventListener('astro:page-load', () => {
+    const sidebarLinks = document.querySelectorAll('.menu-list a');
+    const currentSegment = window.location.pathname.split('/').filter(Boolean).pop();
+
+    sidebarLinks.forEach(($anchor) => {
+      const anchorSegment = $anchor.getAttribute('href')!.split('/').filter(Boolean).pop();
+
+      if (anchorSegment === currentSegment) {
+        $anchor.setAttribute('aria-current', 'page');
+        $anchor.classList.add('is-active');
+      }
+    });
+  });
+</script>

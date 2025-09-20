@@ -1,0 +1,25 @@
+:root {
+  --bulma-primary-h: 340deg;
+  --bulma-primary-s: 82%;
+  --bulma-primary-l: 52%;
+  --bulma-link-h: 340deg;
+  --bulma-link-s: 82%;
+  --bulma-link-l: 52%;
+}
+
+.navbar {
+  box-shadow: 0 1px 2px 0 #0000001a;
+  align-items: center;
+}
+
+.dropdown-trigger > .button:after {
+  display: flex;
+  margin-left: 0.5rem;
+  justify-content: center;
+  content: '';
+  border-top: 0.3em solid;
+  border-right: 0.3em solid transparent;
+  border-bottom: 0;
+  border-left: 0.3em solid transparent;
+  align-items: center;
+}
